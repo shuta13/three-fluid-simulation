@@ -87,7 +87,6 @@ const Canvas: React.FC = () => {
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setClearColor('#1d1d1d')
     renderer.setSize(width, height)
-    renderer.render( scene, camera )
 
     // start animation
     requestRef.current = window.requestAnimationFrame(() => animate({ scene, camera, renderer }))
