@@ -19,6 +19,7 @@ import './Canvas.scss'
 const fragment = require('../shaders/frag.glsl')
 const vertex = require('../shaders/vert.glsl')
 
+// ----------
 // types
 type RenderParams = {
   scene: Scene
@@ -30,11 +31,12 @@ type AnimateParams = {
   camera: PerspectiveCamera
   renderer: WebGLRenderer
 }
+// ----------
 
 const Canvas: React.FC = () => {
   const { width, height } = useGetWindowSize()
 
-  // stats
+  // init stats.js
   const mount = useRef<HTMLDivElement>(null)
   const stats = new Stats()
   stats.showPanel(0)
@@ -50,6 +52,7 @@ const Canvas: React.FC = () => {
     const camera = new PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 1000)
     camera.position.z = 2
 
+    // set object
     const vertexCount = 200 * 3;
     const geometry = new BufferGeometry()
     const positions = []
@@ -106,9 +109,11 @@ const Canvas: React.FC = () => {
   // render
   const render = ({ scene, camera, renderer }: RenderParams) => {
     const time = performance.now()
+
+    // access object of scene
     const object = scene.children[0] as any
     object.rotation.y = time * 0.0005
-    object.material.uniforms.time.value = time * 0.005
+    object.material.uniforms.time.value = Math.atan(time * 0.005)
 
 		renderer.render( scene, camera )
   }
