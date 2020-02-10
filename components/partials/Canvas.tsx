@@ -47,8 +47,8 @@ const Canvas: React.FC = () => {
 
     // init scene
     const scene = new Scene()
-    const camera = new PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 1000)
-    camera.position.z = 2
+    const camera = new PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000)
+    camera.position.z = 1.5
 
     const vertexCount = 200 * 3;
     const geometry = new BufferGeometry()
@@ -56,14 +56,14 @@ const Canvas: React.FC = () => {
     const colors = []
     for (let i = 0; i < vertexCount; i++) {
       // adding x,y,z
-			positions.push( Math.random() - 0.5 )
+      positions.push( Math.random() - 0.5 )
 			positions.push( Math.random() - 0.5 )
 			positions.push( Math.random() - 0.5 )
 			// adding r,g,b,a
+			colors.push( Math.random() * 255 % 200)
+			colors.push( Math.random() * 255 % 100)
 			colors.push( Math.random() * 255 )
-			colors.push( Math.random() * 255 )
-			colors.push( Math.random() * 255 )
-			colors.push( Math.random() * 255 )
+			colors.push( Math.random() * 255)
     }
     const positionAttribute = new Float32BufferAttribute(positions, 3)
     const colorAttribute = new Uint8BufferAttribute(colors, 4)
@@ -91,6 +91,10 @@ const Canvas: React.FC = () => {
 
     // start animation
     requestRef.current = window.requestAnimationFrame(() => animate({ scene, camera, renderer }))
+    const hoge = scene.children[0] as any
+    hoge.geometry.attributes.position.array.map(pos => {
+      console.log(pos)
+    })
   }
 
   // animate
@@ -108,8 +112,28 @@ const Canvas: React.FC = () => {
   const render = ({ scene, camera, renderer }: RenderParams) => {
     const time = performance.now()
     const object = scene.children[0] as any
-    object.rotation.y = time * 0.0005
-    object.material.uniforms.time.value = time * 0.005
+    let positions = []
+    object.geometry.attributes.position.array.map((pos, index) => {
+      if (index % 3 === 1) {
+        pos += Math.random() * 0.05 * Math.cos(time * 0.005 * Math.sin(time)) * Math.sin(time * Math.random() * Math.sin(time))
+        pos %= 1
+        positions.push(pos)
+      }
+      else if (index % 3 === 2) {
+        pos += Math.random() * 0.04 * Math.cos(time * 0.005) * Math.sin(time * 0.005)
+        pos %= 1
+        positions.push(pos)
+      }
+      else {
+        pos += Math.random() * 0.0024 * Math.cos(time * 0.005) * Math.sin(time * 0.005)
+        pos %= 1
+        positions.push(pos)
+      }
+    })
+    const positionAttribute = new Float32BufferAttribute(positions, 3)
+    object.geometry.setAttribute('position', positionAttribute)
+
+    object.material.uniforms.time.value = Math.atan(time * 0.005)
 
 		renderer.render( scene, camera )
   }
