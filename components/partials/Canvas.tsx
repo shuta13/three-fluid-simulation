@@ -94,7 +94,7 @@ const Canvas: React.FC = () => {
     // start animation
     requestRef.current = window.requestAnimationFrame(() => animate({ scene, camera, renderer }))
 
-    window.addEventListener('resize', () => handleCameraAspect({ camera, renderer }))
+    window.addEventListener('resize', () => handleResize({ camera, renderer }))
   }
 
   // animate
@@ -120,14 +120,14 @@ const Canvas: React.FC = () => {
 		renderer.render( scene, camera )
   }
 
-  // handle camera aspect
-  const handleCameraAspect = ({ camera, renderer }: HandleCameraAspectParams) => {
+  // handle resize
+  const handleResize = ({ camera, renderer }: HandleCameraAspectParams) => {
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
     renderer.setSize(window.innerWidth, window.innerHeight)
   }
   useEffect(() => {
-    return () => window.removeEventListener('resize', () => handleCameraAspect)
+    return () => window.removeEventListener('resize', () => handleResize)
   })
   return (
     <div className="CanvasWrap" ref={mount}>
