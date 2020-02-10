@@ -2,6 +2,7 @@ import React from 'react'
 import Head from 'next/head'
 
 import Layout from '../components/common/Layout'
+import Canvas from '../components/partials/Canvas'
 
 const Home = () => (
   <div>
@@ -10,7 +11,9 @@ const Home = () => (
       <link rel="icon" href="/favicon.ico" />
     </Head>
 
-    <Layout>Hi There!</Layout>
+    <Layout>
+      <Canvas />
+    </Layout>
   </div>
 )
 
