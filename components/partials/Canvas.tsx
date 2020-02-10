@@ -1,33 +1,24 @@
 import React from 'react'
-import {
-  WebGLRenderer,
-  Scene, 
-  PerspectiveCamera,
-} from 'three'
-import useGetWindowSize from '../hooks/useGetWindowSize'
+import { Shaders, Node, GLSL } from "gl-react";
+import { Surface } from 'gl-react-dom';
 
 import './Canvas.scss'
 
-const Canvas: React.FC = () => {
-  const { width, height } = useGetWindowSize()
-  const onCanvasLoaded = (canvas: HTMLCanvasElement) => {
-    if (!canvas) {
-      return
-    }
+const fragment = require('../shaders/frag.glsl')
 
-    // init scene
-    const scene = new Scene()
-    const camera = new PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000)
-    const renderer = new WebGLRenderer({ canvas: canvas, antialias: true })
-    renderer.setClearColor('#1d1d1d')
-    renderer.setSize(width, height)
-
-    // render scene
-    renderer.render(scene, camera)
+const shaders = Shaders.create({
+  helloGLSL: {
+    frag: GLSL`${fragment.default}`
   }
+});
+
+const Canvas: React.FC = () => {
+  console.log(fragment.default)
   return (
     <div className="CanvasWrap">
-      <canvas ref={onCanvasLoaded} />
+      <Surface width={400} height={400} >
+        <Node shader={shaders.helloGLSL} />
+      </Surface>
     </div>
   )
 }

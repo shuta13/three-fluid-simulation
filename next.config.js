@@ -4,8 +4,13 @@ module.exports = withSass({
   devIndicators: {
     autoPrerender: false,
   },
-  webpack(config) {
-    // add opt
+  webpack: (config, options) => {
+    config.module.rules.push({
+      test: /\.glsl$/,
+      use: [
+        "raw-loader"
+      ]
+    })
     return config
   }
 })
