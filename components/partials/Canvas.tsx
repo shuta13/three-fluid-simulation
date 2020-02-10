@@ -12,8 +12,6 @@ import {
 } from 'three'
 import Stats from 'stats.js'
 
-import useGetWindowSize from '../hooks/useGetWindowSize'
-
 import './Canvas.scss'
 
 const fragment = require('../shaders/frag.glsl')
@@ -31,11 +29,13 @@ type AnimateParams = {
   camera: PerspectiveCamera
   renderer: WebGLRenderer
 }
+type HandleCameraAspectParams = {
+  camera: PerspectiveCamera
+  renderer: WebGLRenderer
+}
 // ----------
 
 const Canvas: React.FC = () => {
-  const { width, height } = useGetWindowSize()
-
   // init stats.js
   const mount = useRef<HTMLDivElement>(null)
   const stats = new Stats()
@@ -89,10 +89,12 @@ const Canvas: React.FC = () => {
     const renderer = new WebGLRenderer({ canvas: canvas, antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setClearColor('#1d1d1d')
-    renderer.setSize(width, height)
+    renderer.setSize(window.innerWidth, window.innerHeight)
 
     // start animation
     requestRef.current = window.requestAnimationFrame(() => animate({ scene, camera, renderer }))
+
+    window.addEventListener('resize', () => handleCameraAspect({ camera, renderer }))
   }
 
   // animate
@@ -117,6 +119,16 @@ const Canvas: React.FC = () => {
 
 		renderer.render( scene, camera )
   }
+
+  // handle camera aspect
+  const handleCameraAspect = ({ camera, renderer }: HandleCameraAspectParams) => {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+  }
+  useEffect(() => {
+    return () => window.removeEventListener('resize', () => handleCameraAspect)
+  })
   return (
     <div className="CanvasWrap" ref={mount}>
       <canvas ref={onCanvasLoaded} />
