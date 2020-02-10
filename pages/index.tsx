@@ -1,8 +1,13 @@
 import React from 'react'
 import Head from 'next/head'
+import dynamic from 'next/dynamic'
 
 import Layout from '../components/common/Layout'
-import Canvas from '../components/partials/Canvas'
+
+const Canvas = dynamic(
+  () => import('../components/partials/Canvas'),
+  { ssr: false }
+)
 
 const Home = () => (
   <div>

@@ -8,6 +8,9 @@ import useGetWindowSize from '../hooks/useGetWindowSize'
 
 import './Canvas.scss'
 
+const fragment = require('../shaders/frag.glsl')
+console.log(fragment.default)
+
 const Canvas: React.FC = () => {
   const { width, height } = useGetWindowSize()
   const onCanvasLoaded = (canvas: HTMLCanvasElement) => {
