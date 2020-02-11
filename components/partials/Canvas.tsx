@@ -41,9 +41,19 @@ type AnimateParams = {
 // ----------
 
 let time = 0.0
-let shakeWidth = 0.02
 
 const Canvas: React.FC = () => {
+  // hooks
+
+  // shakeWidth state
+  const [shakeWidth, setShakeWidth] = useState(0.004)
+
+  // canvas scale state
+  const [canvasScale, setCanvasScale] = useState({
+    transform: 'scale(1, 1)',
+    opacity: 1
+  })
+  
   // set canvas
   const onCanvasLoaded = (canvas: HTMLCanvasElement) => {
     if (!canvas) {
@@ -132,11 +142,30 @@ const Canvas: React.FC = () => {
 		composer.render()
   }
 
+  // handle mouse over
+  const handleMouseOverCanvas = () => {
+    setCanvasScale({
+      transform: 'scale(1.1, 1.1)',
+      opacity: 1
+    })
+    setShakeWidth(0.02)
+  }
+  const handleMouseLeaveCanvas = () => {
+    setCanvasScale({
+      transform: 'scale(1, 1)',
+      opacity: 0
+    })
+    setShakeWidth(0.004)
+  }
   return (
     <div className="CanvasWrap">
-      <div className="CanvasClipImg">
+      <div className="CanvasClipImg"
+        onMouseOver={handleMouseOverCanvas}
+        onMouseLeave={handleMouseLeaveCanvas}
+      >
         <canvas className="CanvasCanvas"
           ref={onCanvasLoaded}
+          style={{ ...canvasScale }}
         />
         <img className="CanvasImg" src={lena} />
       </div>
