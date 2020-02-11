@@ -1,6 +1,7 @@
 const withSass = require('@zeit/next-sass')
+const withImage = require('next-images')
 
-module.exports = withSass({
+module.exports = withSass(withImage({
   devIndicators: {
     autoPrerender: false,
   },
@@ -13,4 +14,4 @@ module.exports = withSass({
     })
     return config
   }
-})
+}))

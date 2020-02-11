@@ -17,6 +17,8 @@ import './Canvas.scss'
 const fragment = require('../shaders/frag.glsl')
 const vertex = require('../shaders/vert.glsl')
 
+// const lena = require('../../public/static/lena_color.png')
+
 // ----------
 // types
 type RenderParams = {
