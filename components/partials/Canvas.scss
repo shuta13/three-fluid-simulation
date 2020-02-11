@@ -29,6 +29,14 @@
   transition: all cubic-bezier(.27,.19,.44,1) .6s;
 }
 
+@media screen and (max-width: 615px) {
+  .CanvasCanvas:active {
+    transform: scale(1.1, 1.1);
+    opacity: 1;
+    transition: all cubic-bezier(.27,.19,.44,1) .6s;
+  }
+}
+
 .CanvasImg {
   width: 400px;
   height: auto;
