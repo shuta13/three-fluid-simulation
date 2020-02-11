@@ -3,47 +3,52 @@ import {
   WebGLRenderer,
   Scene, 
   PerspectiveCamera,
-  BufferGeometry,
-  Float32BufferAttribute,
-  Uint8BufferAttribute,
-  RawShaderMaterial,
-  DoubleSide,
-  Mesh
+  PlaneGeometry,
+  TextureLoader,
+  ShaderMaterial,
+  Mesh,
+  Vector2,
+  AmbientLight,
+  MeshPhongMaterial
 } from 'three'
-import Stats from 'stats.js'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 
+import useGetWindowSize from '../hooks/useGetWindowSize'
 import './Canvas.scss'
 
 const fragment = require('../shaders/frag.glsl')
 const vertex = require('../shaders/vert.glsl')
 
-// const lena = require('../../public/static/lena_color.png')
+const lena = require('../../public/static/lena_color.png')
 
 // ----------
 // types
 type RenderParams = {
   scene: Scene
-  camera: PerspectiveCamera
-  renderer: WebGLRenderer
+  camera?: PerspectiveCamera
+  renderer?: WebGLRenderer
+  composer: EffectComposer
+  customPass?: ShaderPass
 }
 type AnimateParams = {
   scene: Scene
-  camera: PerspectiveCamera
-  renderer: WebGLRenderer
-}
-type HandleCameraAspectParams = {
-  camera: PerspectiveCamera
-  renderer: WebGLRenderer
+  camera?: PerspectiveCamera
+  renderer?: WebGLRenderer
+  composer: EffectComposer
+  customPass?: ShaderPass
 }
 // ----------
 
+let time = 0.0
+
 const Canvas: React.FC = () => {
-  // init stats.js
-  const mount = useRef<HTMLDivElement>(null)
-  const stats = new Stats()
-  stats.showPanel(0)
-  mount.current?.appendChild(stats.dom)
+
+  // hooks
+  const { width, height } = useGetWindowSize()
   
+  // set canvas
   const onCanvasLoaded = (canvas: HTMLCanvasElement) => {
     if (!canvas) {
       return
@@ -51,88 +56,81 @@ const Canvas: React.FC = () => {
 
     // init scene
     const scene = new Scene()
-    const camera = new PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 1000)
-    camera.position.z = 2
+    const camera = new PerspectiveCamera(50, 400 / 400, 1, 1000)
+    camera.position.z = 1
 
-    // set object
-    const vertexCount = 200 * 3;
-    const geometry = new BufferGeometry()
-    const positions = []
-    const colors = []
-    for (let i = 0; i < vertexCount; i++) {
-      // adding x,y,z
-			positions.push( Math.random() - 0.5 )
-			positions.push( Math.random() - 0.5 )
-			positions.push( Math.random() - 0.5 )
-			// adding r,g,b,a
-			colors.push( Math.random() * 255 )
-			colors.push( Math.random() * 255 )
-			colors.push( Math.random() * 255 )
-			colors.push( Math.random() * 255 )
-    }
-    const positionAttribute = new Float32BufferAttribute(positions, 3)
-    const colorAttribute = new Uint8BufferAttribute(colors, 4)
-    colorAttribute.normalized = true
-    geometry.setAttribute('position', positionAttribute)
-    geometry.setAttribute('color', colorAttribute)
-    const material = new RawShaderMaterial({
-      uniforms: {
-        time: { value: 0.1 }
-      },
-      vertexShader: vertex.default,
-      fragmentShader: fragment.default,
-      side: DoubleSide,
-      transparent: true
-    })
-    const mesh = new Mesh(geometry, material)
-    scene.add(mesh)
-
-    // render scene
+    // render init
     const renderer = new WebGLRenderer({ canvas: canvas, antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setClearColor('#1d1d1d')
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setSize(400, 400)
+
+    // light 
+    const light = new AmbientLight(0xffffff, 1.0)
+    scene.add(light)
+
+    // object
+    const loader = new TextureLoader()
+    const material = new MeshPhongMaterial({
+      map: loader.load(`${lena}`)
+    })
+    const geometry = new PlaneGeometry(1, 1, 1, 1)
+    const mesh = new Mesh(geometry, material)
+    scene.add(mesh)
+
+    const composer = new EffectComposer(renderer)
+    const renderPass = new RenderPass(scene, camera)
+    composer.addPass(renderPass)
+
+    const shaders = {
+      uniforms: {
+        'tDiffuse': {
+          value: null
+        },
+        'time': {
+          type: 'f',
+          value: time
+        },
+        'resolution': {
+          type: 'v2',
+          value: new Vector2(400, 400)
+        }
+      },
+      vertexShader: vertex.default,
+      fragmentShader: fragment.default
+    }
+
+    const customPass = new ShaderPass(shaders)
+    customPass.renderToScreen = true
+    composer.addPass(customPass)
 
     // start animation
-    requestRef.current = window.requestAnimationFrame(() => animate({ scene, camera, renderer }))
-
-    window.addEventListener('resize', () => handleResize({ camera, renderer }))
+    composer.render()
+    requestRef.current = window.requestAnimationFrame(() => animate({ scene, composer, customPass }))
   }
 
   // animate
   const requestRef = useRef(0)
-  const animate = useCallback(({ scene, camera, renderer }: AnimateParams) => {
-    requestRef.current = window.requestAnimationFrame(() => animate({ scene, camera, renderer }))
-    render({ scene, camera, renderer })
-    stats.update()
+  const animate = useCallback(({ scene, composer, customPass }: AnimateParams) => {
+    render({ scene, composer, customPass })
+    requestRef.current = window.requestAnimationFrame(() => animate({ scene, composer, customPass }))
   }, [])
   useEffect(() => {
     return () => window.cancelAnimationFrame(requestRef.current)
   }, [animate])
 
   // render
-  const render = ({ scene, camera, renderer }: RenderParams) => {
-    const time = performance.now()
-
+  const render = ({ scene, composer, customPass }: RenderParams) => {
     // access object of scene
     const object = scene.children[0] as any
-    object.rotation.y = time * 0.0005
-    object.material.uniforms.time.value = Math.atan(time * 0.005)
+    const sec = performance.now() / 1000
+    const pass = customPass as any
+    pass.uniforms.time.value = sec
 
-		renderer.render( scene, camera )
+		composer.render()
   }
-
-  // handle resize
-  const handleResize = ({ camera, renderer }: HandleCameraAspectParams) => {
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-    renderer.setSize(window.innerWidth, window.innerHeight)
-  }
-  useEffect(() => {
-    return () => window.removeEventListener('resize', () => handleResize)
-  })
   return (
-    <div className="CanvasWrap" ref={mount}>
+    <div className="CanvasWrap">
       <canvas ref={onCanvasLoaded} />
     </div>
   )
