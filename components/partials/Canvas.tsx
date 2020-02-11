@@ -12,8 +12,6 @@ import {
 } from 'three'
 import Stats from 'stats.js'
 
-import useGetWindowSize from '../hooks/useGetWindowSize'
-
 import './Canvas.scss'
 
 const fragment = require('../shaders/frag.glsl')
@@ -30,10 +28,12 @@ type AnimateParams = {
   camera: PerspectiveCamera
   renderer: WebGLRenderer
 }
+type HandleCameraAspectParams = {
+  camera: PerspectiveCamera
+  renderer: WebGLRenderer
+}
 
 const Canvas: React.FC = () => {
-  const { width, height } = useGetWindowSize()
-
   // stats
   const mount = useRef<HTMLDivElement>(null)
   const stats = new Stats()
@@ -86,10 +86,13 @@ const Canvas: React.FC = () => {
     const renderer = new WebGLRenderer({ canvas: canvas, antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setClearColor('#1d1d1d')
-    renderer.setSize(width, height)
+    renderer.setSize(window.innerWidth, window.innerHeight)
 
     // start animation
     requestRef.current = window.requestAnimationFrame(() => animate({ scene, camera, renderer }))
+
+    window.addEventListener('resize', () => handleResize({ camera, renderer }))
+
     const hoge = scene.children[0] as any
     hoge.geometry.attributes.position.array.map(pos => {
       console.log(pos)
@@ -106,6 +109,16 @@ const Canvas: React.FC = () => {
   useEffect(() => {
     return () => window.cancelAnimationFrame(requestRef.current)
   }, [animate])
+
+  // handle resize
+  const handleResize = ({ camera, renderer }: HandleCameraAspectParams) => {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+  }
+  useEffect(() => {
+    return () => window.removeEventListener('resize', () => handleResize)
+  })
 
   // render
   const render = ({ scene, camera, renderer }: RenderParams) => {
