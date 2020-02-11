@@ -134,12 +134,12 @@ const Canvas: React.FC = () => {
 
   return (
     <div className="CanvasWrap">
-      <div className="CanvasClipImg">
+      <button className="CanvasClipImg">
         <canvas className="CanvasCanvas"
           ref={onCanvasLoaded}
         />
         <img className="CanvasImg" src={lena} />
-      </div>
+      </button>
     </div>
   )
 }

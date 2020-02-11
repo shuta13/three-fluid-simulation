@@ -8,12 +8,15 @@
 }
 
 .CanvasClipImg {
+  appearance: none;
+  outline: none;
+  border: none;
+  background: #1d1d1d;
   width: 400px;
   height: 400px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: inherit;
 }
 
 .CanvasCanvas {
@@ -21,6 +24,7 @@
   transform: scale(1, 1);
   opacity: 0;
   transition: all cubic-bezier(.27,.19,.44,1) .6s;
+  cursor: pointer;
 }
 
 .CanvasCanvas:hover {
@@ -29,15 +33,8 @@
   transition: all cubic-bezier(.27,.19,.44,1) .6s;
 }
 
-@media screen and (max-width: 615px) {
-  .CanvasCanvas:active {
-    transform: scale(1.1, 1.1);
-    opacity: 1;
-    transition: all cubic-bezier(.27,.19,.44,1) .6s;
-  }
-}
-
 .CanvasImg {
   width: 400px;
   height: auto;
+  cursor: pointer;
 }
