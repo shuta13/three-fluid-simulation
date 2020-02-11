@@ -56,7 +56,7 @@ const Canvas: React.FC = () => {
 
     // init scene
     const scene = new Scene()
-    const camera = new PerspectiveCamera(50, 400 / 400, 1, 1000)
+    const camera = new PerspectiveCamera(53, 400 / 400, 1, 1000)
     camera.position.z = 1
 
     // render init
@@ -93,7 +93,7 @@ const Canvas: React.FC = () => {
         },
         'resolution': {
           type: 'v2',
-          value: new Vector2(400, 400)
+          value: new Vector2(width, height)
         }
       },
       vertexShader: vertex.default,
@@ -131,7 +131,10 @@ const Canvas: React.FC = () => {
   }
   return (
     <div className="CanvasWrap">
-      <canvas ref={onCanvasLoaded} />
+      <canvas className="CanvasCanvas" ref={onCanvasLoaded} />
+      <div className="CanvasClipImg">
+        <img className="CanvasImg" src={lena} />
+      </div>
     </div>
   )
 }

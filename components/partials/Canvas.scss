@@ -4,4 +4,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #1d1d1d;
+}
+
+.CanvasClipImg {
+  width: 400px;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: inherit;
+}
+
+.CanvasCanvas {
+  position: absolute;
+}
+
+.CanvasImg {
+  width: 400px;
+  height: auto;
 }
