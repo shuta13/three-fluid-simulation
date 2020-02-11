@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect } from 'react'
+import React, { useRef, useCallback, useEffect, useState } from 'react'
 import {
   WebGLRenderer,
   Scene, 
@@ -15,7 +15,6 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 
-import useGetWindowSize from '../hooks/useGetWindowSize'
 import './Canvas.scss'
 
 const fragment = require('../shaders/frag.glsl')
@@ -42,12 +41,9 @@ type AnimateParams = {
 // ----------
 
 let time = 0.0
+let shakeWidth = 0.02
 
 const Canvas: React.FC = () => {
-
-  // hooks
-  const { width, height } = useGetWindowSize()
-  
   // set canvas
   const onCanvasLoaded = (canvas: HTMLCanvasElement) => {
     if (!canvas) {
@@ -78,6 +74,8 @@ const Canvas: React.FC = () => {
     const mesh = new Mesh(geometry, material)
     scene.add(mesh)
 
+    renderer.render(scene, camera)
+
     const composer = new EffectComposer(renderer)
     const renderPass = new RenderPass(scene, camera)
     composer.addPass(renderPass)
@@ -93,7 +91,11 @@ const Canvas: React.FC = () => {
         },
         'resolution': {
           type: 'v2',
-          value: new Vector2(width, height)
+          value: new Vector2(window.innerWidth, window.innerHeight)
+        },
+        'shakeWidth': {
+          type: 'f',
+          value: shakeWidth
         }
       },
       vertexShader: vertex.default,
@@ -129,10 +131,13 @@ const Canvas: React.FC = () => {
 
 		composer.render()
   }
+
   return (
     <div className="CanvasWrap">
-      <canvas className="CanvasCanvas" ref={onCanvasLoaded} />
       <div className="CanvasClipImg">
+        <canvas className="CanvasCanvas"
+          ref={onCanvasLoaded}
+        />
         <img className="CanvasImg" src={lena} />
       </div>
     </div>

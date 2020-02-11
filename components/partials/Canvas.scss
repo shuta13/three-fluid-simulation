@@ -18,6 +18,15 @@
 
 .CanvasCanvas {
   position: absolute;
+  transform: scale(1, 1);
+  opacity: 0;
+  transition: all cubic-bezier(.27,.19,.44,1) .6s;
+}
+
+.CanvasCanvas:hover {
+  transform: scale(1.1, 1.1);
+  opacity: 1;
+  transition: all cubic-bezier(.27,.19,.44,1) .6s;
 }
 
 .CanvasImg {
