@@ -52,7 +52,7 @@ const Canvas: React.FC = () => {
 
     // init scene
     const scene = new Scene()
-    const camera = new PerspectiveCamera(53, 400 / 400, 1, 1000)
+    const camera = new PerspectiveCamera(60, 400 / 400, 1, 1000)
     camera.position.z = 1
 
     // render init
