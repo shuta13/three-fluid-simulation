@@ -132,11 +132,22 @@ const Canvas: React.FC = () => {
 		composer.render()
   }
 
+  // handle mouse hover event
+  const [isHovered, setIsHovered] = useState(false)
+  const handleMouseEnter = () => {
+    setIsHovered(true)
+  }
+  const handleMouseLeave = () => {
+    setIsHovered(false)
+  }
+
   return (
     <div className="CanvasWrap">
       <button className="CanvasClipImg">
-        <canvas className="CanvasCanvas"
+        <canvas className={ isHovered ? "CanvasCanvasHovered" : "CanvasCanvas" }
           ref={onCanvasLoaded}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         />
         <img className="CanvasImg" src={lena} />
       </button>

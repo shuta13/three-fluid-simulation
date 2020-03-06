@@ -8,6 +8,7 @@
 }
 
 .CanvasClipImg {
+  position: absolute;
   appearance: none;
   outline: none;
   border: none;
@@ -23,26 +24,22 @@
   position: absolute;
   transform: scale(1, 1);
   opacity: 0;
-  transition: all cubic-bezier(.27,.19,.44,1) .6s;
+  transition: transform cubic-bezier(.27,.19,.44,1) .6s, opacity cubic-bezier(.27,.19,.44,1) .6s;
   cursor: pointer;
 }
 
-.CanvasCanvas:hover {
+.CanvasCanvasHovered {
+  position: absolute;
   transform: scale(1.1, 1.1);
   opacity: 1;
-  transition: all cubic-bezier(.27,.19,.44,1) .6s;
-}
+  transition: transform cubic-bezier(.27,.19,.44,1) .6s;
+  cursor: pointer;
 
-@media screen and (max-width: 615px) {
-  .CanvasCanvas:active {
-    transform: scale(1.1, 1.1);
-    opacity: 1;
-    transition: all cubic-bezier(.27,.19,.44,1) .6s;
-  }
 }
 
 .CanvasImg {
   width: 360px;
   height: auto;
+  opacity: 1;
   cursor: pointer;
 }
